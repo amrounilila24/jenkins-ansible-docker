@@ -1,62 +1,120 @@
 node {
-
-    // =====================
-    // VARIABLES
-    // =====================
-    def registryProjet = "registry.gitlab.com/amrounilila24/pres"
-    def IMAGE = "${registryProjet}:compil-${env.BUILD_ID}"
-    def img
-
-    // =====================
-    // BUILD APP (DOCKER)
-    // =====================
-    stage('Build - Clone App') {
-        dir('build') {
-            git branch: 'main',
-                url: 'https://gitlab.com/amrounilila24/pres.git'
-        }
+   def registryProjet='registry.gitlab.com/amrounilila24/pesentatios_jenkins"
+   def IMAGE="${registryProjet}:compil-${env.BUILD_ID}"
+    stage('Build - Clone') {
+          git 'https://github.com/amrounilila24/war-build-docker.git'
     }
-
-    stage('Build - Docker Image') {
-        dir('build') {
-            img = docker.build("${IMAGE}")
-        }
+    stage('Build - Maven package'){
+            sh 'mvn package'
     }
-
+    def img = stage('Build') {
+          docker.build("$IMAGE",  '.')
+    }
     stage('Build - Test') {
-        img.withRun("--name run-${env.BUILD_ID} -p 8081:8080") {
+            img.withRun("--name run-$BUILD_ID -p 8081:8080") { c ->
             sh 'docker ps'
-            sh 'sleep 10'
-            sh 'curl http://localhost:8081 || true'
-        }
+            sh 'netstat -ntaup'
+            sh 'sleep 30s'
+            sh 'curl 127.0.0.1:8081'
+            sh 'docker ps'
+          }
     }
-
     stage('Build - Push') {
-        docker.withRegistry('https://registry.gitlab.com', 'reg1') {
-            img.push()
-            img.push('latest')
-        }
+          docker.withRegistry('https://registry.gitlab.com', 'reg1') {
+              img.push 'latest'
+              img.push()
+          }
     }
-
-    // =====================
-    // DEPLOY (ANSIBLE)
-    // =====================
     stage('Deploy - Clone') {
-        dir('deploy') {
-            git branch: 'master',
-                url: 'https://github.com/amrounilila24/jenkins-ansible-docker.git'
-        }
+          git 'https://github.com/amrounilia24/jenkins-ansible-docker.git'
+    }
+    stage('Deploy - End') {
+      ansiblePlaybook (
+          colorized: true,
+          become: true,
+          playbook: 'playbook.yml',
+         inventory: '${HOST},',
+          extras: "--extra-vars 'image=$IMAGE'"
+      )
     }
 
-    stage('Deploy - End') {
-        dir('deploy') {
-            ansiblePlaybook(
-                colorized: true,
-                become: true,
-                playbook: 'playbook.yml',
-                inventory: "${HOST},",
-                extras: "--extra-vars \"image=${IMAGE}\""
-            )
-        }
+}
+   def registryProjet='registry.gitlab.com/amrounilila24/presentations_jenkins'
+   def IMAGE="${registryProjet}:compil-${env.BUILD_ID}"
+    stage('Build - Clone') {
+          git 'https://github.com/amrounilila24/war-build-docker.git'
     }
+    stage('Build - Maven package'){
+            sh 'mvn package'
+    }
+    def img = stage('Build') {
+          docker.build("$IMAGE",  '.')
+    }
+    stage('Build - Test') {
+            img.withRun("--name run-$BUILD_ID -p 8081:8080") { c ->
+            sh 'docker ps'
+            sh 'netstat -ntaup'
+            sh 'sleep 30s'
+            sh 'curl 127.0.0.1:8081'
+            sh 'docker ps'
+          }
+    }
+    stage('Build - Push') {
+          docker.withRegistry('https://registry.gitlab.com', 'reg1') {
+              img.push 'latest'
+              img.push()
+          }
+    }
+    stage('Deploy - Clone') {
+          git 'https://github.com/amrounilila24/jenkins-ansible-docker.git'
+    }
+    stage('Deploy - End') {
+      ansiblePlaybook (
+          colorized: true,
+          become: true,
+          playbook: 'playbook.yml',
+         inventory: '${HOST},',
+          extras: "--extra-vars 'image=$IMAGE'"
+      )
+    }
+
+}
+   def IMAGE="${registryProjet}:version-${env.BUILD_ID}"
+    stage('Build - Clone') {
+          git 'https://github.com/amrounilila24/war-build-docker.git'
+    }
+    stage('Build - Maven package'){
+            sh 'mvn package'
+    }
+    def img = stage('Build') {
+          docker.build("$IMAGE",  '.')
+    }
+    stage('Build - Test') {
+            img.withRun("--name run-$BUILD_ID -p 8081:8080") { c ->
+            sh 'docker ps'
+            sh 'netstat -ntaup'
+            sh 'sleep 30s'
+            sh 'curl 127.0.0.1:8081'
+            sh 'docker ps'
+          }
+    }
+    stage('Build - Push') {
+          docker.withRegistry('https://registry.gitlab.com', 'reg1') {
+              img.push 'latest'
+              img.push()
+          }
+    }
+    stage('Deploy - Clone') {
+          git 'https://github.com/amrounilila24/jenkins-ansible-docker.git'
+    }
+    stage('Deploy - End') {
+      ansiblePlaybook (
+          colorized: true,
+          become: true,
+          playbook: 'playbook.yml',
+         inventory: '${HOST},',
+          extras: "--extra-vars 'image=$IMAGE'"
+      )
+    }
+
 }
