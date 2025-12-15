@@ -1,25 +1,18 @@
-- name: Deploy Docker container
-  hosts: all
-  become: true
+- name: install pip
+  apt:
+    name: python-pip
+    state: present
 
-  tasks:
-    - name: Install pip (Python3)
-      apt:
-        name: python3-pip
-        state: present
-        update_cache: yes
+- name: pip install docker-py
+  pip:
+    name:
+      - docker
+      - docker-compose
 
-    - name: Install Docker Python modules
-      pip:
-        name:
-          - docker
-          - docker-compose
-        executable: pip3
-
-    - name: Run container
-      docker_container:
-        name: wartest
-        image: "{{ image }}"
-        ports:
-          - "8081:8080"
-        state: started
+- name: run container
+  docker_container:
+    name: wartest
+    image: "{{ image }}"
+    ports: 8081:8080
+    state: started
+ 
