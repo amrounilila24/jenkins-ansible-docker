@@ -19,7 +19,7 @@
   docker_login:
     registry_url: "https://registry.gitlab.com"
     username: "amrounilila24"
-    password: "Eloise2023@"
+    password: "glpat-sLl1w4QJrkx119CdhtH-Ym86MQp1Omo5YjlhCw.01.121vf2h4f"
 
 - name: Run wartest container
   docker_container:
