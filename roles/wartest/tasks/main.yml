@@ -1,38 +1,27 @@
 ---
-- name: Deploy wartest container
-  hosts: all
-  become: true
+- name: Ensure python3 and pip are installed
+  apt:
+    name:
+      - python3
+      - python3-pip
+      - python3-setuptools
+    state: present
+    update_cache: yes
 
-  tasks:
+- name: Install Docker SDK for Python
+  command: python3 -m pip install docker
 
-    - name: Ensure python3 and pip are installed
-      apt:
-        name:
-          - python3
-          - python3-pip
-          - python3-setuptools
-        state: present
-        update_cache: yes
+- name: Docker login to GitLab registry
+  docker_login:
+    registry_url: registry.gitlab.com
+    username: token_wartest
+    password: "{{ gitlab_token }}"
 
-    - name: Ensure pip is up to date
-      command: python3 -m pip install --upgrade pip
-      args:
-        creates: /usr/local/bin/pip3
-
-    - name: Install Docker SDK for Python
-      command: python3 -m pip install docker
-
-    - name: Docker login to GitLab registry
-      docker_login:
-        registry_url: registry.gitlab.com
-        username: token_wartest
-        password: "{{ gitlab_token }}"
-
-    - name: Run wartest container
-      docker_container:
-        name: wartest
-        image: "{{ image }}"
-        published_ports:
-          - "8081:8080"
-        restart_policy: always
-        state: started
+- name: Run wartest container
+  docker_container:
+    name: wartest
+    image: "{{ image }}"
+    published_ports:
+      - "8081:8080"
+    restart_policy: always
+    state: started
