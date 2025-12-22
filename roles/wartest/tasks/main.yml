@@ -17,7 +17,6 @@
     username: "{{ gitlab_user }}"
     password: "{{ gitlab_token }}"
 
-# 🔍 DEBUG (TEMPORAIRE)
 - name: Debug image finale
   debug:
     msg: "Image finale = {{ registry_image }}:{{ image }}"
