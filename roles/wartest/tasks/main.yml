@@ -17,8 +17,8 @@
 - name: Docker login to GitLab registry
   docker_login:
     registry_url: registry.gitlab.com
-    username: token_wartest
-    password: "{{ gitlab_token }}"
+    username: amrounilila24
+    password: "{{ Eloise2023@ }}"
 
 - name: Run wartest container
   docker_container:
