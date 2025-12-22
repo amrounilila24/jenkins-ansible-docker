@@ -1,18 +1,30 @@
-- name: install pip
+---
+- name: Ensure python3 and pip are installed
   apt:
-    name: python-pip
-    state: present
-
-- name: pip install docker-py
-  pip:
     name:
-      - docker
-      - docker-compose
+      - python3
+      - python3-pip
+      - python3-setuptools
+    state: present
+    update_cache: yes
 
-- name: run container
+- name: Upgrade pip
+  command: python3 -m pip install --upgrade pip
+
+- name: Install Docker SDK for Python
+  command: python3 -m pip install docker
+
+- name: Docker login to GitLab registry
+  docker_login:
+    registry_url: registry.gitlab.com
+    username: token_wartest
+    password: "{{ gitlab_token }}"
+
+- name: Run wartest container
   docker_container:
     name: wartest
-    image: "{{ image }}"
-    ports: 8081:8080
+    image: "{{ image }}"
+    published_ports:
+      - "8081:8080"
+    restart_policy: always
     state: started
- 
