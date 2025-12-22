@@ -11,6 +11,12 @@
       - docker
       - docker-compose
 
+- name: Login to GitLab Registry
+  community.docker.docker_login:
+    registry_url: registry.gitlab.com
+    username: "{{ gitlab_user }}"
+    password: "{{ gitlab_token }}"
+
 - name: Run container
   community.docker.docker_container:
     name: wartest
