@@ -1,17 +1,20 @@
-- name: install pip
+---
+- name: Install pip
   apt:
-    name: python-pip
+    name: python3-pip
     state: present
+    update_cache: yes
 
-- name: pip install docker-py
+- name: Install Docker Python libraries
   pip:
     name:
       - docker
       - docker-compose
 
-- name: run container
-  docker_container
+- name: Run container
+  community.docker.docker_container:
     name: wartest
-    image: "{{ image }}"
-    ports: 8081:8080
+    image: "{{ image }}"
+    published_ports:
+      - "8081:8080"
     state: started
