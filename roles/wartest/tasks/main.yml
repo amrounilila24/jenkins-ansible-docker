@@ -1,31 +1,34 @@
 ---
-# ❌ PAS de apt update
-
-- name: Ensure python3-pip is installed
-  apt:
-    name:
-      - python3-pip
-      - python3-setuptools
-    state: present
+- name: Deploy wartest container
+  hosts: all
   become: true
 
-- name: Install Docker SDK for Python
-  pip:
-    name: docker
-    executable: pip3
-  become: true
+  tasks:
 
-- name: Docker login to GitLab registry
-  docker_login:
-    registry_url: "https://registry.gitlab.com"
-    username: "amrounilila24"
-    password: "glpat-sLl1w4QJrkx119CdhtH-Ym86MQp1Omo5YjlhCw.01.121vf2h4f"
+    - name: Ensure python3-pip is installed
+      apt:
+        name:
+          - python3-pip
+          - python3-setuptools
+        state: present
+        update_cache: yes
 
-- name: Run wartest container
-  docker_container:
-    name: wartest
-    image: "{{ image }}"
-    published_ports:
-      - "8081:8080"
-    state: started
-  become: true
+    - name: Install Docker SDK for Python
+      pip:
+        name: docker
+        executable: pip3
+
+    - name: Docker login to GitLab registry
+      docker_login:
+        registry_url: registry.gitlab.com
+        username: token_wartest
+        password: "{{ gitlab_token }}"
+
+    - name: Run wartest container
+      docker_container:
+        name: wartest
+        image: "{{ image }}"
+        published_ports:
+          - "8081:8080"
+        restart_policy: always
+        state: started
